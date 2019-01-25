@@ -1,7 +1,13 @@
-﻿using Akka.Actor;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿/*
+ * TellActivity.cs
+ *
+ * Copyright (c) 2019 aratomo-arazon
+ *
+ * This software is released under the MIT License.
+ * http://opensource.org/licenses/mit-license.php
+ */
+
+using Akka.Actor;
 using WFLite.Activities;
 using WFLite.Interfaces;
 
@@ -9,7 +15,11 @@ namespace WFLite.Akka.Activities
 {
     public class TellActivity : SyncActivity
     {
-        public IActorRef _actor;
+        public IVariable ActorRef
+        {
+            private get;
+            set;
+        }
 
         public IVariable Message
         {
@@ -17,20 +27,21 @@ namespace WFLite.Akka.Activities
             set;
         }
 
-        public TellActivity(IActorRef actor)
+        public TellActivity()
         {
-            _actor = actor;
         }
 
-        public TellActivity(IActorRef actor, IVariable message)
+        public TellActivity(IVariable actorRef, IVariable message)
         {
-            _actor = actor;
+            ActorRef = actorRef;
             Message = message;
         }
 
         protected sealed override bool run()
         {
-            _actor.Tell(Message.GetValue());
+            var actor = ActorRef.GetValue<IActorRef>();
+
+            actor.Tell(Message.GetValue());
 
             return true;
         }

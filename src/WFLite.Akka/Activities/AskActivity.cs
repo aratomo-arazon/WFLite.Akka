@@ -1,26 +1,30 @@
-﻿using Akka.Actor;
+﻿/*
+ * AskActivity.cs
+ *
+ * Copyright (c) 2019 aratomo-arazon
+ *
+ * This software is released under the MIT License.
+ * http://opensource.org/licenses/mit-license.php
+ */
+ 
+using Akka.Actor;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using WFLite.Activities;
-using WFLite.Akka.Bases;
 using WFLite.Interfaces;
 
 namespace WFLite.Akka.Activities
 {
     public class AskActivity : AsyncActivity
     {
-        private IActorRef _actor;
-
-        public IVariable Message
+        public IVariable ActorRef
         {
             private get;
             set;
         }
 
-        public IVariable Timeout
+        public IVariable Message
         {
             private get;
             set;
@@ -32,31 +36,37 @@ namespace WFLite.Akka.Activities
             set;
         }
 
-        public AskActivity(IActorRef actor)
+        public IVariable Timeout
         {
-            _actor = actor;
+            private get;
+            set;
         }
 
-        public AskActivity(IActorRef actor, IVariable message, IVariable timeout = null, IVariable result = null)
+        public AskActivity()
         {
-            _actor = actor;
+        }
+
+        public AskActivity(IVariable actorRef, IVariable message, IVariable result = null, IVariable timeout = null)
+        {
+            ActorRef = actorRef;
             Message = message;
-            Timeout = timeout;
             Result = result;
+            Timeout = timeout;
         }
 
         protected sealed override async Task<bool> run(CancellationToken cancellationToken)
         {
-            var result = default(object);
+            var actorRef = ActorRef.GetValue<IActorRef>();
             var message = Message.GetValue();
+            var result = default(object);
 
             if (Timeout == null)
             {
-                result = await _actor.Ask(message, cancellationToken);
+                result = await actorRef.Ask(message, cancellationToken);
             }
             else
             {
-                result = await _actor.Ask(message, Timeout.GetValue<TimeSpan>(), cancellationToken);
+                result = await actorRef.Ask(message, Timeout.GetValue<TimeSpan>(), cancellationToken);
             }
 
             if (Result != null)

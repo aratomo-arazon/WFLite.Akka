@@ -12,11 +12,12 @@ namespace WFLite.Akka.HelloWorld
         static async Task Main(string[] args)
         {
             var actorSystem = ActorSystem.Create("test");
-            var actor = actorSystem.ActorOf<ConsoleWriteLineActor>();
+            var consoleActor = actorSystem.ActorOf<ConsoleActor>();
 
-            var activity = new AskActivity(actor)
+            var activity = new AskActivity()
             {
-                Message = new AnyVariable() { Value = "Hello World!" }
+                ActorRef = new AnyVariable(consoleActor),
+                Message = new AnyVariable("Hello World!")
             };
 
             await activity.Start();
