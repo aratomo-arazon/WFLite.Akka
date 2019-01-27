@@ -34,7 +34,7 @@ namespace WFLite.Akka.Variables
         }
 
         public ActorSelectionVariable(IActorContext context, IActorRef self, IActorRef sender, IVariable actorPath, IVariable anchorRef = null, IConverter converter = null)
-            : base(context, self, sender)
+            : base(context, self, sender, converter)
         {
             ActorPath = actorPath;
             AnchorRef = anchorRef;

@@ -10,6 +10,7 @@
 using Akka.Actor;
 using Microsoft.Extensions.Logging;
 using WFLite.Bases;
+using WFLite.Interfaces;
 using WFLite.Logging.Bases;
 
 namespace WFLite.Akka.Bases
@@ -22,7 +23,8 @@ namespace WFLite.Akka.Bases
 
         private readonly IActorRef _sender;
 
-        public ActorVariable(IActorContext context, IActorRef self, IActorRef sender)
+        public ActorVariable(IActorContext context, IActorRef self, IActorRef sender, IConverter converter = null)
+            : base(converter)
         {
             _context = context;
             _self = self;
@@ -52,8 +54,8 @@ namespace WFLite.Akka.Bases
 
         private readonly IActorRef _sender;
 
-        public ActorVariable(ILogger<TCategoryName> logger, IActorContext context, IActorRef self, IActorRef sender)
-            : base(logger)
+        public ActorVariable(ILogger<TCategoryName> logger, IActorContext context, IActorRef self, IActorRef sender, IConverter converter = null)
+            : base(logger, converter)
         {
             _context = context;
             _self = self;
