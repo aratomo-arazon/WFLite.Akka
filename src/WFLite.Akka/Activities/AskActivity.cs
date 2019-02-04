@@ -18,25 +18,25 @@ namespace WFLite.Akka.Activities
 {
     public class AskActivity : AsyncActivity
     {
-        public IVariable ActorRef
+        public IOutVariable<ICanTell> ActorRef
         {
             private get;
             set;
         }
 
-        public IVariable Message
+        public IOutVariable Request
         {
             private get;
             set;
         }
 
-        public IVariable Result
+        public IInVariable Response
         {
             private get;
             set;
         }
 
-        public IVariable Timeout
+        public IOutVariable<TimeSpan> Timeout
         {
             private get;
             set;
@@ -46,32 +46,94 @@ namespace WFLite.Akka.Activities
         {
         }
 
-        public AskActivity(IVariable actorRef, IVariable message, IVariable result = null, IVariable timeout = null)
+        public AskActivity(IOutVariable<ICanTell> actorRef, IOutVariable request, IInVariable response = null, IOutVariable<TimeSpan> timeout = null)
         {
             ActorRef = actorRef;
-            Message = message;
-            Result = result;
+            Request = request;
+            Response = response;
             Timeout = timeout;
         }
 
         protected sealed override async Task<bool> run(CancellationToken cancellationToken)
         {
-            var actorRef = ActorRef.GetValue<IActorRef>();
-            var message = Message.GetValue();
-            var result = default(object);
+            var actorRef = ActorRef.GetValue();
+            var request = Request.GetValueAsObject();
+            var response = default(object);
 
             if (Timeout == null)
             {
-                result = await actorRef.Ask(message, cancellationToken);
+                response = await actorRef.Ask(request, cancellationToken);
             }
             else
             {
-                result = await actorRef.Ask(message, Timeout.GetValue<TimeSpan>(), cancellationToken);
+                response = await actorRef.Ask(request, Timeout.GetValue(), cancellationToken);
             }
 
-            if (Result != null)
+            if (Response != null)
             {
-                Result.SetValue(result);
+                Response.SetValue(response);
+            }
+
+            return true;
+        }
+    }
+
+    public class AskActivity<TRequest, TResponse> : AsyncActivity
+    {
+        public IOutVariable<ICanTell> ActorRef
+        {
+            private get;
+            set;
+        }
+
+        public IOutVariable<TRequest> Request
+        {
+            private get;
+            set;
+        }
+
+        public IInVariable<TResponse> Response
+        {
+            private get;
+            set;
+        }
+
+        public IOutVariable<TimeSpan> Timeout
+        {
+            private get;
+            set;
+        }
+
+        public AskActivity()
+        {
+        }
+
+        public AskActivity(IOutVariable<ICanTell> actorRef, IOutVariable<TRequest> request, IInVariable<TResponse> response = null, IOutVariable<TimeSpan> timeout = null)
+        {
+            ActorRef = actorRef;
+            Request = request;
+            Response = response;
+            Timeout = timeout;
+        }
+
+        protected sealed override async Task<bool> run(CancellationToken cancellationToken)
+        {
+            var actorRef = ActorRef.GetValue();
+            var request = Request.GetValue();
+            var response = default(TResponse);
+
+            if (Timeout == null)
+            {
+                response = await actorRef.Ask<TResponse>(request, cancellationToken);
+            }
+            else
+            {
+                response = await actorRef.Ask<TResponse>(request, Timeout.GetValue(), cancellationToken);
+            }
+
+            if (Response != null)
+            {
+                Response.SetValue(response);
             }
 
             return true;

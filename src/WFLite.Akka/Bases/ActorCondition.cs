@@ -9,12 +9,11 @@
  
 using Akka.Actor;
 using Microsoft.Extensions.Logging;
-using WFLite.Bases;
 using WFLite.Logging.Bases;
 
 namespace WFLite.Akka.Bases
 {
-    public abstract class ActorCondition : Condition
+    public abstract class ActorCondition : LoggingCondition
     {
         private readonly IActorContext _context;
 
@@ -22,30 +21,7 @@ namespace WFLite.Akka.Bases
 
         private readonly IActorRef _sender;
 
-        public ActorCondition(IActorContext context, IActorRef self, IActorRef sender)
-        {
-            _context = context;
-            _self = self;
-            _sender = sender;
-        }
-
-        protected sealed override bool check()
-        {
-            return check(_context, _self, _sender);
-        }
-
-        protected abstract bool check(IActorContext context, IActorRef self, IActorRef sender);
-    }
-
-    public abstract class ActorCondition<TCategoryName> : LoggingCondition<TCategoryName>
-    {
-        private readonly IActorContext _context;
-
-        private readonly IActorRef _self;
-
-        private readonly IActorRef _sender;
-
-        public ActorCondition(ILogger<TCategoryName> logger, IActorContext context, IActorRef self, IActorRef sender)
+        public ActorCondition(ILogger logger, IActorContext context, IActorRef self, IActorRef sender)
             : base(logger)
         {
             _context = context;
@@ -53,11 +29,11 @@ namespace WFLite.Akka.Bases
             _sender = sender;
         }
 
-        protected sealed override bool check(ILogger<TCategoryName> logger)
+        protected sealed override bool check(ILogger logger)
         {
             return check(logger, _context, _self, _sender);
         }
 
-        protected abstract bool check(ILogger<TCategoryName> logger, IActorContext context, IActorRef self, IActorRef sender);
+        protected abstract bool check(ILogger logger, IActorContext context, IActorRef self, IActorRef sender);
     }
 }

@@ -11,12 +11,11 @@ using Akka.Actor;
 using Microsoft.Extensions.Logging;
 using System.Threading;
 using System.Threading.Tasks;
-using WFLite.Activities;
 using WFLite.Logging.Bases;
 
 namespace WFLite.Akka.Bases
 {
-    public abstract class ActorAsyncActivity : AsyncActivity
+    public abstract class ActorAsyncActivity : LoggingAsyncActivity
     {
         private readonly IActorContext _context;
 
@@ -24,30 +23,7 @@ namespace WFLite.Akka.Bases
 
         private readonly IActorRef _sender;
 
-        public ActorAsyncActivity(IActorContext context, IActorRef self, IActorRef sender)
-        {
-            _context = context;
-            _self = self;
-            _sender = sender;
-        }
-
-        protected sealed override Task<bool> run(CancellationToken cancellationToken)
-        {
-            return run(_context, _self, _sender, cancellationToken);
-        }
-
-        protected abstract Task<bool> run(IActorContext context, IActorRef self, IActorRef sender, CancellationToken cancellationToken);
-    }
-
-    public abstract class ActorAsyncActivity<TCategoryName> : LoggingAsyncActivity<TCategoryName>
-    {
-        private readonly IActorContext _context;
-
-        private readonly IActorRef _self;
-
-        private readonly IActorRef _sender;
-
-        public ActorAsyncActivity(ILogger<TCategoryName> logger, IActorContext context, IActorRef self, IActorRef sender)
+        public ActorAsyncActivity(ILogger logger, IActorContext context, IActorRef self, IActorRef sender)
             : base(logger)
         {
             _context = context;
@@ -55,11 +31,11 @@ namespace WFLite.Akka.Bases
             _sender = sender;
         }
 
-        protected sealed override Task<bool> run(ILogger<TCategoryName> logger, CancellationToken cancellationToken)
+        protected sealed override Task<bool> run(ILogger logger, CancellationToken cancellationToken)
         {
             return run(logger, _context, _self, _sender, cancellationToken);
         }
 
-        protected abstract Task<bool> run(ILogger<TCategoryName> logger, IActorContext context, IActorRef self, IActorRef sender, CancellationToken cancellationToken);
+        protected abstract Task<bool> run(ILogger logger, IActorContext context, IActorRef self, IActorRef sender, CancellationToken cancellationToken);
     }
 }

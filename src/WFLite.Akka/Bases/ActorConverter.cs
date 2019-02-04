@@ -13,7 +13,7 @@ using WFLite.Logging.Bases;
 
 namespace WFLite.Akka.Bases
 {
-    public abstract class ActorConverter : WFLite.Bases.Converter
+    public abstract class ActorConverter : LoggingConverter
     {
         private readonly IActorContext _context;
 
@@ -21,30 +21,7 @@ namespace WFLite.Akka.Bases
 
         private readonly IActorRef _sender;
 
-        public ActorConverter(IActorContext context, IActorRef self, IActorRef sender)
-        {
-            _context = context;
-            _self = self;
-            _sender = sender;
-        }
-
-        protected sealed override object convert(object value)
-        {
-            return convert(_context, _self, _sender);
-        }
-
-        protected abstract bool convert(IActorContext context, IActorRef self, IActorRef sender);
-    }
-
-    public abstract class ActorConverter<TCategoryName> : LoggingConverter<TCategoryName>
-    {
-        private readonly IActorContext _context;
-
-        private readonly IActorRef _self;
-
-        private readonly IActorRef _sender;
-
-        public ActorConverter(ILogger<TCategoryName> logger, IActorContext context, IActorRef self, IActorRef sender)
+        public ActorConverter(ILogger logger, IActorContext context, IActorRef self, IActorRef sender)
             : base(logger)
         {
             _context = context;
@@ -52,11 +29,11 @@ namespace WFLite.Akka.Bases
             _sender = sender;
         }
 
-        protected sealed override object convert(ILogger<TCategoryName> logger, object value)
+        protected sealed override object convert(ILogger logger, object value)
         {
             return convert(logger, _context, _self, _sender);
         }
 
-        protected abstract bool convert(ILogger<TCategoryName> logger, IActorContext context, IActorRef self, IActorRef sender);
+        protected abstract bool convert(ILogger logger, IActorContext context, IActorRef self, IActorRef sender);
     }
 }

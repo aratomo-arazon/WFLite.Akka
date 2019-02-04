@@ -16,8 +16,8 @@ namespace WFLite.Akka.HelloWorld
 
             var activity = new AskActivity()
             {
-                ActorRef = new AnyVariable(consoleActor),
-                Message = new AnyVariable("Hello World!")
+                ActorRef = new AnyVariable<IActorRef>(consoleActor),
+                Request = new AnyVariable("Hello World!")
             };
 
             await activity.Start();

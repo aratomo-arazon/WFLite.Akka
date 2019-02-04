@@ -15,13 +15,19 @@ namespace WFLite.Akka.Activities
 {
     public class TellActivity : SyncActivity
     {
-        public IVariable ActorRef
+        public IOutVariable ActorRef
         {
             private get;
             set;
         }
 
-        public IVariable Message
+        public IOutVariable Message
+        {
+            private get;
+            set;
+        }
+
+        public IOutVariable<IActorRef> Sender
         {
             private get;
             set;
@@ -31,17 +37,87 @@ namespace WFLite.Akka.Activities
         {
         }
 
-        public TellActivity(IVariable actorRef, IVariable message)
+        public TellActivity(IOutVariable actorRef, IOutVariable message, IOutVariable<IActorRef> sender)
         {
             ActorRef = actorRef;
             Message = message;
+            Sender = sender;
         }
 
         protected sealed override bool run()
         {
-            var actor = ActorRef.GetValue<IActorRef>();
+            var actor = ActorRef.GetValueAsObject();
 
-            actor.Tell(Message.GetValue());
+            if (actor is IActorRef)
+            {
+                if (Sender == null)
+                {
+                    (actor as IActorRef).Tell(Message.GetValueAsObject());
+                }
+                else
+                {
+                    (actor as IActorRef).Tell(Message.GetValueAsObject(), Sender.GetValue());
+                }
+            }
+            else if (actor is ICanTell)
+            {
+                (actor as ICanTell).Tell(Message.GetValueAsObject(), Sender.GetValue());
+            }
+
+            return true;
+        }
+    }
+
+    public class TellActivity<TMessage> : SyncActivity
+    {
+        public IOutVariable ActorRef
+        {
+            private get;
+            set;
+        }
+
+        public IOutVariable<TMessage> Message
+        {
+            private get;
+            set;
+        }
+
+        public IOutVariable<IActorRef> Sender
+        {
+            private get;
+            set;
+        }
+
+        public TellActivity()
+        {
+        }
+
+        public TellActivity(IOutVariable actorRef, IOutVariable<TMessage> message, IOutVariable<IActorRef> sender)
+        {
+            ActorRef = actorRef;
+            Message = message;
+            Sender = sender;
+        }
+
+        protected sealed override bool run()
+        {
+            var actor = ActorRef.GetValueAsObject();
+
+            if (actor is IActorRef)
+            {
+                if (Sender == null)
+                {
+                    (actor as IActorRef).Tell(Message.GetValueAsObject());
+                }
+                else
+                {
+                    (actor as IActorRef).Tell(Message.GetValueAsObject(), Sender.GetValue());
+                }
+            }
+            else if (actor is ICanTell)
+            {
+                (actor as ICanTell).Tell(Message.GetValueAsObject(), Sender.GetValue());
+            }
 
             return true;
         }

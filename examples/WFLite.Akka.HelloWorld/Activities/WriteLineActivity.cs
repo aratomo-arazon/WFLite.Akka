@@ -21,7 +21,7 @@ namespace WFLite.Akka.HelloWorld.Activities
                     new ConsoleWriteLineActivity(new AnyVariable(message)),
                     new TellActivity()
                     {
-                        ActorRef = new AnyVariable(sender),
+                        ActorRef = new AnyVariable<IActorRef>(sender),
                         Message = new AnyVariable(message)
                     }
                 }
