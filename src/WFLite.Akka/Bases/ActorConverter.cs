@@ -21,6 +21,13 @@ namespace WFLite.Akka.Bases
 
         private readonly IActorRef _sender;
 
+        public ActorConverter(IActorContext context, IActorRef self, IActorRef sender)
+        {
+            _context = context;
+            _self = self;
+            _sender = sender;
+        }
+
         public ActorConverter(ILogger logger, IActorContext context, IActorRef self, IActorRef sender)
             : base(logger)
         {
@@ -29,11 +36,11 @@ namespace WFLite.Akka.Bases
             _sender = sender;
         }
 
-        protected sealed override object convert(ILogger logger, object value)
+        protected sealed override object convert(object value)
         {
-            return convert(logger, _context, _self, _sender);
+            return convert(_context, _self, _sender);
         }
 
-        protected abstract bool convert(ILogger logger, IActorContext context, IActorRef self, IActorRef sender);
+        protected abstract bool convert(IActorContext context, IActorRef self, IActorRef sender);
     }
 }

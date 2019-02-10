@@ -21,6 +21,13 @@ namespace WFLite.Akka.Bases
 
         private readonly IActorRef _sender;
 
+        public ActorSyncActivity(IActorContext context, IActorRef self, IActorRef sender)
+        {
+            _context = context;
+            _self = self;
+            _sender = sender;
+        }
+
         public ActorSyncActivity(ILogger logger, IActorContext context, IActorRef self, IActorRef sender)
             : base(logger)
         {
@@ -29,11 +36,11 @@ namespace WFLite.Akka.Bases
             _sender = sender;
         }
 
-        protected sealed override bool run(ILogger logger)
+        protected sealed override bool run()
         {
-            return run(logger, _context, _self, _sender);
+            return run(_context, _self, _sender);
         }
 
-        protected abstract bool run(ILogger logger, IActorContext context, IActorRef self, IActorRef sender);
+        protected abstract bool run(IActorContext context, IActorRef self, IActorRef sender);
     }
 }

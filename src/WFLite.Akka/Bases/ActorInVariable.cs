@@ -8,11 +8,13 @@
  */
  
 using Akka.Actor;
+using Microsoft.Extensions.Logging;
 using WFLite.Bases;
+using WFLite.Logging.Bases;
 
 namespace WFLite.Akka.Bases
 {
-    public abstract class ActorInVariable : InVariable
+    public abstract class ActorInVariable : LoggingInVariable
     {
         private readonly IActorContext _context;
 
@@ -27,6 +29,14 @@ namespace WFLite.Akka.Bases
             _sender = sender;
         }
 
+        public ActorInVariable(ILogger logger, IActorContext context, IActorRef self, IActorRef sender)
+            : base(logger)
+        {
+            _context = context;
+            _self = self;
+            _sender = sender;
+        }
+
         protected sealed override void setValue(object value)
         {
             setValue(_context, _self, _sender, value);
@@ -35,7 +45,7 @@ namespace WFLite.Akka.Bases
         protected abstract void setValue(IActorContext context, IActorRef self, IActorRef sender, object value);
     }
 
-    public abstract class ActorInVariable<TValue> : InVariable<TValue>
+    public abstract class ActorInVariable<TValue> : LoggingInVariable<TValue>
     {
         private readonly IActorContext _context;
 
@@ -44,6 +54,14 @@ namespace WFLite.Akka.Bases
         private readonly IActorRef _sender;
 
         public ActorInVariable(IActorContext context, IActorRef self, IActorRef sender)
+        {
+            _context = context;
+            _self = self;
+            _sender = sender;
+        }
+
+        public ActorInVariable(ILogger logger, IActorContext context, IActorRef self, IActorRef sender)
+            : base(logger)
         {
             _context = context;
             _self = self;

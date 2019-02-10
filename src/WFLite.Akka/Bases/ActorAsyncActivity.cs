@@ -23,6 +23,13 @@ namespace WFLite.Akka.Bases
 
         private readonly IActorRef _sender;
 
+        public ActorAsyncActivity(IActorContext context, IActorRef self, IActorRef sender)
+        {
+            _context = context;
+            _self = self;
+            _sender = sender;
+        }
+
         public ActorAsyncActivity(ILogger logger, IActorContext context, IActorRef self, IActorRef sender)
             : base(logger)
         {
@@ -31,11 +38,11 @@ namespace WFLite.Akka.Bases
             _sender = sender;
         }
 
-        protected sealed override Task<bool> run(ILogger logger, CancellationToken cancellationToken)
+        protected sealed override Task<bool> run(CancellationToken cancellationToken)
         {
-            return run(logger, _context, _self, _sender, cancellationToken);
+            return run(_context, _self, _sender, cancellationToken);
         }
 
-        protected abstract Task<bool> run(ILogger logger, IActorContext context, IActorRef self, IActorRef sender, CancellationToken cancellationToken);
+        protected abstract Task<bool> run(IActorContext context, IActorRef self, IActorRef sender, CancellationToken cancellationToken);
     }
 }

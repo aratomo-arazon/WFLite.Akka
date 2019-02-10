@@ -21,6 +21,13 @@ namespace WFLite.Akka.Bases
 
         private readonly IActorRef _sender;
 
+        public ActorCondition(IActorContext context, IActorRef self, IActorRef sender)
+        {
+            _context = context;
+            _self = self;
+            _sender = sender;
+        }
+
         public ActorCondition(ILogger logger, IActorContext context, IActorRef self, IActorRef sender)
             : base(logger)
         {
@@ -29,11 +36,11 @@ namespace WFLite.Akka.Bases
             _sender = sender;
         }
 
-        protected sealed override bool check(ILogger logger)
+        protected sealed override bool check()
         {
-            return check(logger, _context, _self, _sender);
+            return check(_context, _self, _sender);
         }
 
-        protected abstract bool check(ILogger logger, IActorContext context, IActorRef self, IActorRef sender);
+        protected abstract bool check(IActorContext context, IActorRef self, IActorRef sender);
     }
 }
