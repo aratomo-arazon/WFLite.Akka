@@ -9,6 +9,7 @@
 
 using Akka.Actor;
 using WFLite.Activities;
+using WFLite.Bases;
 using WFLite.Interfaces;
 
 namespace WFLite.Akka.Activities
